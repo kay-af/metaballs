@@ -1,6 +1,6 @@
 # Metaballs simulation
 
-<img src="./preview/preview.gif"></img>
+<img src="https://raw.githubusercontent.com/kay-af/metaballs/main/preview/preview.gif"></img>
 
 **Metaballs** _(Not to be confused with Meatballs)_ In computer graphics, metaballs are organic-looking n-dimensional isosurfaces, characterised by their ability to meld together when in close proximity to create single, contiguous objects.
 Source: [Wikipedia](https://en.wikipedia.org/wiki/Metaballs)
