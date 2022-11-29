@@ -1,5 +1,5 @@
 // Number of metaballs
-int N = 7;
+int N = 8;
 
 Blob blobs[];
 Grid grid;
@@ -19,11 +19,10 @@ void setup() {
 void draw() {
   background(0);
   
-  noFill();
-  strokeWeight(4);
   for (int i=0; i<N; i++) {
     Blob blob = blobs[i];
     blob.update();
-    grid.draw();
   }
+  
+  grid.update();
 }

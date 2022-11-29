@@ -20,7 +20,7 @@ class Blob {
     float velY = sin(angle);
     
     // Randomize speed to calculate velocity.
-    float speed = random(0.5, 1.5);
+    float speed = random(1, 2.5);
     this.velocity = new PVector(velX, velY);
     this.velocity.mult(speed);
   }

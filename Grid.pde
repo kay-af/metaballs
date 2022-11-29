@@ -1,7 +1,7 @@
 // A Grid defines the squares for the marching square algorithm
 class Grid {
   float[][] points;
-   
+  
   // Size of each marching square
   float squareSize = 8;
   
@@ -18,10 +18,10 @@ class Grid {
   // Get the type of the square being inspected
   int computeType(float va, float vb, float vc, float vd) {
     
-    int a = va >= 1 ? 1 : 0;
-    int b = vb >= 1 ? 2 : 0;
-    int c = vc >= 1 ? 4 : 0;
-    int d = vd >= 1 ? 8 : 0;
+    int a = (va > 1) ? 1 : 0;
+    int b = (vb > 1) ? 2 : 0;
+    int c = (vc > 1) ? 4 : 0;
+    int d = (vd > 1) ? 8 : 0;
     
     return a | b | c | d;
   }
@@ -42,6 +42,7 @@ class Grid {
   
   // Given two points, draw a contour
   void drawContour(float[] p1, float[] p2) {
+    
     float x1 = p1[0];
     float y1 = p1[1];
     float x2 = p2[0];
@@ -52,7 +53,7 @@ class Grid {
   
   
   // Update and draw the metaball simulation using the marching squares algorithm.
-  void draw() {
+  void update() {
     
     // Calculating the contribution of each blob on a point.
     for(int x=0; x<this.points.length; x++) {
@@ -109,9 +110,14 @@ class Grid {
         // Calculate the lerp factor using the inverse lerp function to estimate the position of the points
         // that form the line segment to be drawn.
         float fab = calculateFactor(va, vb);
-        float fad = calculateFactor(va, vd);
-        float fcb = calculateFactor(vc, vb);
+        float fbc = calculateFactor(vb, vc);
         float fcd = calculateFactor(vc, vd);
+        float fda = calculateFactor(vd, va);
+        
+        float[] bottom = interpolate(pxa, pya, pxb, pyb, fab);
+        float[] right = interpolate(pxb, pyb, pxc, pyc, fbc);
+        float[] top = interpolate(pxc, pyc, pxd, pyd, fcd);
+        float[] left = interpolate(pxd, pyd, pxa, pya, fda);
         
         float[] p1 = null, p2 = null, p3 = null, p4 = null;
         
@@ -119,50 +125,51 @@ class Grid {
         switch(type) {
            case 1:
            case 14:
-             p1 = interpolate(pxa, pya, pxb, pyb, fab);
-             p2 = interpolate(pxa, pya, pxd, pyd, fad);
+             p1 = left;
+             p2 = bottom;
              break;
            case 2:
            case 13:
-             p1 = interpolate(pxc, pyc, pxb, pyb, fcb);
-             p2 = interpolate(pxa, pya, pxb, pyb, fab);
+             p1 = right;
+             p2 = bottom;
              break;
            case 3:
            case 12:
-             p1 = interpolate(pxa, pya, pxd, pyd, fad);
-             p2 = interpolate(pxc, pyc, pxb, pyb, fcb);
+             p1 = left;
+             p2 = right;
              break;
            case 4:
            case 11:
-             p1 = interpolate(pxc, pyc, pxd, pyd, fcd);
-             p2 = interpolate(pxc, pyc, pxb, pyb, fcb);
+             p1 = top;
+             p2 = right;
              break;
            case 5:
-             p1 = interpolate(pxc, pyc, pxd, pyd, fcd);
-             p2 = interpolate(pxa, pya, pxd, pyd, fad);
-             p3 = interpolate(pxc, pyc, pxb, pyb, fcb);
-             p4 = interpolate(pxa, pya, pxb, pyb, fab);
+             p1 = top;
+             p2 = left;
+             p3 = right;
+             p4 = bottom;
              break;
            case 6:
            case 9:
-             p1 = interpolate(pxc, pyc, pxd, pyd, fcd);
-             p2 = interpolate(pxa, pya, pxb, pyb, fab);
+             p1 = top;
+             p2 = bottom;
              break;
            case 7:
            case 8:
-             p1 = interpolate(pxc, pyc, pxd, pyd, fcd);
-             p2 = interpolate(pxa, pya, pxd, pyd, fad);
+             p1 = top;
+             p2 = left;
              break;
            case 10:
-             p1 = interpolate(pxc, pyc, pxd, pyd, fcd);
-             p2 = interpolate(pxc, pyc, pxb, pyb, fcb);
-             p3 = interpolate(pxa, pya, pxd, pyd, fad);
-             p4 = interpolate(pxa, pya, pxb, pyb, fab);
+             p1 = top;
+             p2 = right;
+             p3 = left;
+             p4 = bottom;
              break;
         }
         
-        // Set the color of the line segments based on position before drawing the contours.
-        stroke(255, 255 * xa / points.length, 255 * ya / points[0].length);
+        noFill();
+        stroke(255, map(0, width, 0, 255, pxa), map(0, height, 0, 255, pya));
+        strokeWeight(4);
         
         // Draw the contours if the points are available.
         if (p1 != null) {
@@ -174,6 +181,5 @@ class Grid {
         }
       }
     }
-    
   }
 }
