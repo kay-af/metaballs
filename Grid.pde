@@ -2,6 +2,9 @@
 class Grid {
   float[][] points;
   
+  // Polygon buffer
+  float[][] polygon = new float[6][2];
+  
   // Size of each marching square
   float squareSize = 8;
   
@@ -13,6 +16,7 @@ class Grid {
     int rows = ceil((float)height / squareSize) + 1;
     
     points = new float[columns][rows];
+    polygon = new float[6][2];
   }
   
   // Get the type of the square being inspected
@@ -41,14 +45,21 @@ class Grid {
   }
   
   // Given two points, draw a contour
-  void drawContour(float[] p1, float[] p2) {
+  void drawPolygon() {
     
-    float x1 = p1[0];
-    float y1 = p1[1];
-    float x2 = p2[0];
-    float y2 = p2[1];
+    if (polygon[0] == null) return;
     
-    line(x1, y1, x2, y2);
+    noStroke();
+    fill(0,0,255);
+    
+    beginShape();
+    int i = 0;
+    while (i<6 && polygon[i] != null) {
+      float[] point = polygon[i];
+      vertex(point[0], point[1]);
+      i++;
+    }
+    endShape(CLOSE);
   }
   
   
@@ -98,6 +109,11 @@ class Grid {
         float pxd = xd * squareSize;
         float pyd = yd * squareSize;
         
+        float[] pa = new float[] { pxa, pya };
+        float[] pb = new float[] { pxb, pyb };
+        float[] pc = new float[] { pxc, pyc };
+        float[] pd = new float[] { pxd, pyd };
+        
         // Values of the points
         float va = this.points[xa][ya];
         float vb = this.points[xb][yb];
@@ -119,66 +135,120 @@ class Grid {
         float[] top = interpolate(pxc, pyc, pxd, pyd, fcd);
         float[] left = interpolate(pxd, pyd, pxa, pya, fda);
         
-        float[] p1 = null, p2 = null, p3 = null, p4 = null;
+        for(int i=0; i<6; i++) polygon[i] = null;
+        
+        //for(int i=0; i<points.length; i++) {
+        //  println(points[i]);
+        //}
         
         // Calculating the line segment points using linear interpolation to smooth out the edges.
         switch(type) {
            case 1:
+             polygon[0] = left;
+             polygon[1] = bottom;
+             polygon[2] = pa;
+             break;
            case 14:
-             p1 = left;
-             p2 = bottom;
+             polygon[0] = left;
+             polygon[1] = pd;
+             polygon[2] = pc;
+             polygon[3] = pb;
+             polygon[4] = bottom;
              break;
+             
            case 2:
+             polygon[0] = right;
+             polygon[1] = bottom;
+             polygon[2] = pb;
+             break;
            case 13:
-             p1 = right;
-             p2 = bottom;
+             polygon[0] = right;
+             polygon[1] = pc;
+             polygon[2] = pd;
+             polygon[3] = pa;
+             polygon[4] = bottom;
              break;
+             
            case 3:
+             polygon[0] = left;
+             polygon[1] = right;
+             polygon[2] = pb;
+             polygon[3] = pa;
+             break;
            case 12:
-             p1 = left;
-             p2 = right;
+             polygon[0] = left;
+             polygon[1] = right;
+             polygon[2] = pc;
+             polygon[3] = pd;
              break;
+           
            case 4:
+             polygon[0] = top;
+             polygon[1] = right;
+             polygon[2] = pc;
+             break;
            case 11:
-             p1 = top;
-             p2 = right;
+             polygon[0] = top;
+             polygon[1] = right;
+             polygon[2] = pb;
+             polygon[3] = pa;
+             polygon[4] = pd;
              break;
+           
            case 5:
-             p1 = top;
-             p2 = left;
-             p3 = right;
-             p4 = bottom;
+             polygon[0] = top;
+             polygon[1] = pc;
+             polygon[2] = right;
+             polygon[3] = bottom;
+             polygon[4] = pa;
+             polygon[5] = left;
              break;
+           
            case 6:
+             polygon[0] = top;
+             polygon[1] = pc;
+             polygon[2] = pb;
+             polygon[3] = bottom;
+             break;
            case 9:
-             p1 = top;
-             p2 = bottom;
+             polygon[0] = top;
+             polygon[1] = pd;
+             polygon[2] = pa;
+             polygon[3] = bottom;
              break;
+           
            case 7:
-           case 8:
-             p1 = top;
-             p2 = left;
+             polygon[0] = top;
+             polygon[1] = pc;
+             polygon[2] = pb;
+             polygon[3] = pa;
+             polygon[4] = left;
              break;
+           case 8:
+             polygon[0] = top;
+             polygon[1] = pd;
+             polygon[2] = left;
+             break;
+           
            case 10:
-             p1 = top;
-             p2 = right;
-             p3 = left;
-             p4 = bottom;
+             polygon[0] = top;
+             polygon[1] = right;
+             polygon[2] = pb;
+             polygon[3] = bottom;
+             polygon[4] = left;
+             polygon[5] = pd;
+             break;
+           
+           case 15:
+             polygon[0] = pa;
+             polygon[1] = pb;
+             polygon[2] = pc;
+             polygon[3] = pd;
              break;
         }
-        
-        noFill();
-        stroke(255, map(0, width, 0, 255, pxa), map(0, height, 0, 255, pya));
-        strokeWeight(4);
         
         // Draw the contours if the points are available.
-        if (p1 != null) {
-          drawContour(p1, p2);
-        }
-        
-        if (p3 != null) {
-          drawContour(p3, p4);
-        }
+        drawPolygon();
       }
     }
   }

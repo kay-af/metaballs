@@ -7,7 +7,7 @@ class Blob {
   Blob() {
     
     // Random radius
-    this.radius = random(40, 80);
+    this.radius = random(30, 50);
     
     // Place at a random valid position
     float x = random(this.radius, width - this.radius);

@@ -1,5 +1,5 @@
 // Number of metaballs
-int N = 8;
+int N = 14;
 
 Blob blobs[];
 Grid grid;
@@ -17,7 +17,7 @@ void setup() {
 }
 
 void draw() {
-  background(0);
+  background(255);
   
   for (int i=0; i<N; i++) {
     Blob blob = blobs[i];
